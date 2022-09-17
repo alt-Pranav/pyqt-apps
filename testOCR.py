@@ -42,7 +42,7 @@ class MainWindow(QWidget):
         self.Worker1.stop()
 
 class Worker1(QThread):
-    ImageUpdate = pyqtSignal(QImage, numpy.ndarray)
+    ImageUpdate = pyqtSignal(QImage, Image.Image)
     def run(self):
         self.ThreadActive = True
         Capture = cv2.VideoCapture(0)
@@ -55,9 +55,11 @@ class Worker1(QThread):
                 ConvertToQtFormat = QImage(FlippedImage.data, FlippedImage.shape[1], FlippedImage.shape[0], QImage.Format.Format_RGB888)
                 Pic = ConvertToQtFormat.scaled(640, 480, Qt.AspectRatioMode.KeepAspectRatio)
 
-                self.ImageUpdate.emit(Pic, img)
+                imageForOCR = Image.fromarray(img)
 
-        Capture.release()
+                self.ImageUpdate.emit(Pic, imageForOCR)
+
+        #Capture.release()
 
     def stop(self):
         self.ThreadActive = False
