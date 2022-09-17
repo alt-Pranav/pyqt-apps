@@ -1,13 +1,10 @@
 import sys
-from typing import List
-from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
     QApplication,
     QWidget,
     QTableWidget,
     QTableWidgetItem,
     QPushButton,
-    QBoxLayout,
     QVBoxLayout,
 )
 
