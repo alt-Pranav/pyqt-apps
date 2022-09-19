@@ -3,6 +3,9 @@ from PyQt6.QtWidgets import *
 from PyQt6.QtCore import *
 from PyQt6.QtGui import *
 import cv2
+import pytesseract
+
+pytesseract.pytesseract.tesseract_cmd="C:/Program Files/Tesseract-OCR/tesseract.exe"
 
 class AppWindow(QWidget):
 
@@ -28,16 +31,21 @@ class AppWindow(QWidget):
         self.videoGetter.start()
 
         self.videoGetter.ImageUpdate.connect(self.ImageUpdateSlot)
+        self.videoGetter.ocrUpdate.connect(self.ocrUpdateSlot)
         self.setLayout(self.VBL)
 
     def ImageUpdateSlot(self, img):
         self.FeedLabel.setPixmap(QPixmap.fromImage(img))
 
+    def ocrUpdateSlot(self, words):
+        self.ocrLabel.setText(words)
+
 
 class VideoHandler(QThread): 
 
     ImageUpdate = pyqtSignal(QImage)
-    stream = cv2.VideoCapture(1)
+    ocrUpdate = pyqtSignal(str)
+    stream = cv2.VideoCapture(0)
     (grabbed, frame) = stream.read()
     stopped = False
 
@@ -53,6 +61,8 @@ class VideoHandler(QThread):
                 ConvertToQtFormat = QImage(FlippedImage.data, FlippedImage.shape[1], FlippedImage.shape[0], QImage.Format.Format_RGB888)
                 Pic = ConvertToQtFormat.scaled(640, 480, Qt.AspectRatioMode.KeepAspectRatio)
                 self.ImageUpdate.emit(Pic)
+
+                self.ocrUpdate.emit(pytesseract.image_to_string(Image))
 
     def stop(self):
         self.stopped = True
