@@ -24,11 +24,6 @@ class ustApp(QWidget):
     def __init__(self):
         super().__init__(parent=None)
 
-        # defining data members needed across multiple functions
-        self.excelFilePath = "{0}.xlsx".format(datetime.date)
-        self.scanInterval = 500 # in milliseconds
-        self.currentMeasure = ""
-
         self.resize(DIMENSION, DIMENSION)
         self.setWindowTitle("MULTIMETER READER")
 
@@ -39,11 +34,43 @@ class ustApp(QWidget):
         # for the Camera View and Data Table
         self.displayLayout = QVBoxLayout()
 
+
+        self.displayLayout.addWidget(CameraWidget())
+        self.displayLayout.addWidget(ReadingsTableWidget())
+        
+
+        self.appLayout.addWidget(InputValuesWidget())
+        self.appLayout.addLayout(self.displayLayout)
+
+
+class CameraWidget(QWidget):
+
+    def __init__(self):
+        super().__init__(parent = None)
+        self.resize(DIMENSION//2, DIMENSION-500)
+        self.show()
         # need to create separate thread for OCR
 
+class ReadingsTableWidget(QWidget):
+
+    def __init__(self):
+        super().__init__(parent = None)
+        self.resize(DIMENSION//2, DIMENSION-500)
+        self.show()
         # data table
         self.table = QTableWidget()
-        self.displayLayout.addWidget(self.table)
+
+class InputValuesWidget(QWidget):
+
+    def __init__(self):
+        super().__init__(parent = None)
+
+        self.resize(DIMENSION, 500)
+        
+        # defining data members needed across multiple functions
+        self.excelFilePath = "{0}.xlsx".format(datetime.date)
+        self.scanInterval = 500 # in milliseconds
+        self.currentMeasure = ""
 
         # for taking user input
         self.inputLayout = QFormLayout()
@@ -62,12 +89,7 @@ class ustApp(QWidget):
         self.inputLayout.addRow(self.submitUserInput)
 
         self.inputLayout.setVerticalSpacing(20)        
-        self.inputLayout.setContentsMargins(10,10,10,10)
-
-
-        self.appLayout.addLayout(self.inputLayout)
-        self.appLayout.addLayout(self.displayLayout)
-
+        self.show()
 
     def getUserInput(self):
         if self.fileName.text() and self.filePath.text():
@@ -79,8 +101,6 @@ class ustApp(QWidget):
                 self.fileName.setText("INVALID INPUT")
             else:
                 self.filePath.setText("INVALID INPUT")
-
-
 
 if __name__ == "__main__":
     app = QApplication([])
